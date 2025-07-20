@@ -32,7 +32,7 @@ def get_all_notes():
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute('''
-        SELECT * FROM notes
+        SELECT * FROM notes ORDER BY created_at DESC;
     ''')
     rows = cursor.fetchall()
     conn.close()
@@ -41,9 +41,29 @@ def get_all_notes():
 def get_note_by_id(note_id):
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM notes WHERE id = ?', note_id)
+    cursor.execute('SELECT * FROM notes WHERE id = ?', (note_id,))
     row = cursor.fetchone()
     conn.close()
     return row
 
+def update_note_by_id(title, content, note_id):
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute(
+            'UPDATE notes SET title = ?, content = ?, created_at = ?  WHERE id = ?',
+            (title, content, datetime.now(), note_id)
+        )
+    conn.commit()
+    res = cursor.rowcount
+    conn.close()
+    return res
 
+def delete_note_by_id(note_id):
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute(
+        'DELETE FROM notes WHERE id = ?', (note_id,)
+    )
+    conn.commit()
+    conn.close()
+    
