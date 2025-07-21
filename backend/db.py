@@ -46,12 +46,12 @@ def get_note_by_id(note_id):
     conn.close()
     return row
 
-def update_note_by_id(title, content, note_id):
+def update_note_by_id(title, content, note_id, tags):
     conn = sqlite3.connect(DB_FILE)
     cursor = conn.cursor()
     cursor.execute(
-            'UPDATE notes SET title = ?, content = ?, created_at = ?  WHERE id = ?',
-            (title, content, datetime.now(), note_id)
+            'UPDATE notes SET title = ?, content = ?, created_at = ?, tags = ?  WHERE id = ?',
+            (title, content, datetime.now(), tags, note_id)
         )
     conn.commit()
     res = cursor.rowcount

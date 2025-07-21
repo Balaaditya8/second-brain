@@ -14,8 +14,7 @@ def add_note():
     data = request.get_json()
     title = data.get("title")
     content = data.get("content")
-    tags = ','.join(data.get('tags', []))
-
+    tags = generate_tags_from_text(title + "\n" + content) 
     note_id = insert_note(title, content, tags)
     embeddings = get_embedding(content)
     metadata = {
@@ -59,7 +58,8 @@ def update_note_route(note_id):
     data = request.get_json()
     title = data.get('title')
     content = data.get('content')
-    result = update_note_by_id(title,content, note_id)
+    tags = data.get('tags')
+    result = update_note_by_id(title,content, note_id, tags)
     return jsonify({"message": "Note saved", "note_id": note_id})
 
 @app.route('/note/<int:note_id>', methods=['DELETE'])
@@ -117,7 +117,22 @@ def summarize_multiple_notes():
     summary = response['message']['content']
     return jsonify({'summary': summary})
 
-
-
+def generate_tags_from_text(text):
+    response = ollama.chat(
+        model="mistral",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that generates 3 to 5 simple tags suitable for given content and returns the tags only in comma separated format"
+            },
+            {
+                "role": "user",
+                "content": f"Please generate 3 to 5 tags for given content:\n\n{text} \n Return the generated tags in comma separated format"
+            }
+        ]
+    )
+    tags = response['message']['content']
+    print(tags)
+    return tags
 if __name__ == '__main__':
     app.run(debug=True)

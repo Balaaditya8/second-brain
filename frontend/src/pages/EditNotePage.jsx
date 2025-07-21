@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getNoteById, updateNote, deleteNote, getNoteSummary } from "../api/note";
 import SummarySidebar from "../components/SummarySidebar";
+import TagEditor from "../components/TagEditor";
 
 const EditNotePage = () => {
   const { id } = useParams();
@@ -10,6 +11,7 @@ const EditNotePage = () => {
   const [note, setNote] = useState(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [summary, setSummary] = useState("");
 
@@ -19,12 +21,17 @@ const EditNotePage = () => {
       setNote(data);
       setTitle(data.title);
       setContent(data.content);
+      setTags(
+        data.tags
+          ? data.tags.split(",").map((tag) => tag.trim()).filter(Boolean)
+          : []
+      );
     };
     fetchNote();
   }, [id]);
 
   const handleSave = async () => {
-    await updateNote(id, { title, content });
+    await updateNote(id, { title, content, tags: tags.join(", "), });
     navigate("/");
   };
 
@@ -60,6 +67,12 @@ const EditNotePage = () => {
           onChange={(e) => setContent(e.target.value)}
           placeholder="Write your note here..."
         />
+
+        {/* 🏷️ Tag Editor */}
+        <div>
+          <label className="text-sm font-medium text-gray-700">Tags</label>
+          <TagEditor tags={tags} setTags={setTags} />
+        </div>
 
         <div className="flex justify-end space-x-3">
           <button
