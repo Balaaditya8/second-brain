@@ -66,6 +66,61 @@ const Home = () => {
     }
   };
 
+  const groupNotesByMonth = (notesArray) => {
+    const grouped = {};
+    notesArray.forEach((note) => {
+      const date = new Date(note.created_at);
+      const month = date.toLocaleString("default", { month: "long" });
+      const year = date.getFullYear();
+      const key = `${month} ${year}`;
+
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(note);
+    });
+    return grouped;
+  };
+
+  const renderGroupedNotes = () => {
+    if (!filteredNotes.length) {
+      return (
+        <p className="text-gray-500 text-center mt-10">No notes found.</p>
+      );
+    }
+
+    const sorted = [...filteredNotes].sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+    const recentNotes = sorted.slice(0, 3);
+    const remainingNotes = sorted.slice(3);
+    const monthlyGroups = groupNotesByMonth(remainingNotes);
+
+    return (
+      <>
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-3">Recent</h2>
+          <NoteList
+            notes={recentNotes}
+            selectedNoteIds={selectedNoteIds}
+            onToggleSelect={toggleSelectNote}
+          />
+        </div>
+
+        {Object.entries(monthlyGroups).map(([month, notes]) => (
+          <div key={month} className="mb-10">
+            <h3 className="text-lg font-semibold mb-2">{month}</h3>
+            <NoteList
+              notes={notes}
+              selectedNoteIds={selectedNoteIds}
+              onToggleSelect={toggleSelectNote}
+            />
+          </div>
+        ))}
+      </>
+    );
+  };
+
+
+
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -98,11 +153,7 @@ const Home = () => {
         </form>
 
         {/* Notes */}
-        <NoteList
-          notes={filteredNotes}
-          selectedNoteIds={selectedNoteIds}
-          onToggleSelect={toggleSelectNote}
-        />
+        {renderGroupedNotes()}
 
         {/* Floating Add */}
         <button
