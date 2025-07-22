@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getNoteById, updateNote, deleteNote, getNoteSummary } from "../api/note";
 import SummarySidebar from "../components/SummarySidebar";
 import TagEditor from "../components/TagEditor";
+import ChatSidebar from "../components/ChatSidebar";
 
 const EditNotePage = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ const EditNotePage = () => {
   const [tags, setTags] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [summary, setSummary] = useState("");
+  const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
     const fetchNote = async () => {
@@ -108,7 +110,20 @@ const EditNotePage = () => {
         summary={summary}
         title={`Summary of "${title}"`}
         />
+
+
+        {/* Chat toggle button */}
+              <button
+                className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700"
+                onClick={() => setChatOpen(true)}
+              >
+                💬
+              </button>
+        
+              <ChatSidebar isOpen={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
+
+    
   );
 };
 

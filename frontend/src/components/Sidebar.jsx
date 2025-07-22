@@ -1,8 +1,11 @@
 // components/Sidebar.jsx
 import React, { useState } from "react";
+import { PlusIcon, PencilIcon, PencilSquareIcon, ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon,ChevronDoubleRightIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = ({ tags, onSelectTag }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div
@@ -12,12 +15,22 @@ const Sidebar = ({ tags, onSelectTag }) => {
     >
       <div className="flex justify-between items-center mb-6">
         {!collapsed && <h2 className="text-lg font-semibold">Second Brain</h2>}
-        <button
+        <div
           onClick={() => setCollapsed(!collapsed)}
           className="text-gray-600 hover:text-gray-800"
         >
-          {collapsed ? ">>" : "<<"}
-        </button>
+          {collapsed ? <ChevronDoubleRightIcon className="h-5 w-9" /> : <ChevronDoubleLeftIcon className="h-5 w-5" />}
+        </div>
+      </div>
+
+      {/* Add Note */}
+      <div
+        onClick={() => navigate("/new")}
+        className="flex items-center cursor-pointer mb-4 p-2 hover:bg-blue-100 rounded text-blue-600"
+        title="Add Note"
+      >
+        <PencilIcon className="h-5 w-5" />
+        {!collapsed && <span className="ml-2">Add Note</span>}
       </div>
 
       {!collapsed && (

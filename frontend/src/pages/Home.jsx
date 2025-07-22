@@ -5,6 +5,7 @@ import { getAllNotes, searchNotes, getMultiNoteSummary } from '../api/note';
 import { useNavigate } from "react-router-dom";
 import SummarySidebar from '../components/SummarySidebar';
 import Sidebar from '../components/Sidebar';
+import ChatSidebar from '../components/ChatSidebar';
 
 const Home = () => {
   const [notes, setNotes] = useState([]);
@@ -14,6 +15,7 @@ const Home = () => {
   const [summary, setSummary] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [allTags, setAllTags] = useState([]);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -155,14 +157,7 @@ const Home = () => {
         {/* Notes */}
         {renderGroupedNotes()}
 
-        {/* Floating Add */}
-        <button
-          onClick={() => navigate("/new")}
-          className="fixed bottom-6 right-6 bg-blue-400 text-white p-6 rounded-full shadow-lg hover:bg-blue-500 transition"
-          title="Add Note"
-        >
-          +
-        </button>
+        
       </div>
 
       {/* Summary Sidebar */}
@@ -171,6 +166,16 @@ const Home = () => {
         onClose={() => setIsSidebarOpen(false)}
         summary={summary}
       />
+
+      {/* Chat toggle button */}
+      <button
+        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700"
+        onClick={() => setChatOpen(true)}
+      >
+        💬
+      </button>
+
+      <ChatSidebar isOpen={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
   );
 };

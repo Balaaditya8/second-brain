@@ -134,5 +134,37 @@ def generate_tags_from_text(text):
     tags = response['message']['content']
     print(tags)
     return tags
+
+@app.route('/rag-chat', methods=['POST'])
+def rag_chat():
+    data = request.get_json()
+    messages = data.get("messages")
+    user_query = next((msg["content"] for msg in reversed(messages) if msg["role"] == "user"), "")
+
+    query_embedding = get_embedding(user_query)
+    results = search_similar_notes(query_embedding, top_k=3)
+
+    matched_ids = results["ids"][0]
+    print(matched_ids)
+    context_notes = []
+    for note_id in matched_ids:
+        note = get_note_by_id(note_id)
+        if note:
+            context_notes.append(note)
+    print(context_notes)
+    context_text = "\n\n---\n\n".join(
+        f"Title: {note[1]}\nContent: {note[2]}" for note in context_notes
+    )
+    print(context_text)
+    context_message = {
+        "role": "system",
+        "content": f"""You are a helpful assistant used in a note taking app. Base your answers on the following notes that were pulled up by a RAG system. Neglect the unnecessary content in the text if not related to the given query:\n\n{context_text}"""
+    }
+
+    ollama_messages = [context_message] + messages[-5:]
+
+    response = ollama.chat(model="mistral", messages=ollama_messages)
+    return jsonify({"response": response["message"]["content"]})
+
 if __name__ == '__main__':
     app.run(debug=True)
